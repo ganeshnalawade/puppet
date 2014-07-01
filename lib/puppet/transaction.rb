@@ -74,6 +74,12 @@ class Puppet::Transaction
     end
   end
 
+## JLS:2012-11-01: adding hook for marking end of transaction
+## --------------  run so that folks know when everything is done
+
+  class << self
+     attr_accessor :on_transaction_done
+     
   # This method does all the actual work of running a transaction.  It
   # collects all of the changes, executes them, and responds to any
   # necessary events.
@@ -148,6 +154,12 @@ class Puppet::Transaction
       end
     end
 
+    ## JLS:12-11-01: call the transaction_done function if
+    ## ------------  if someone installed it
+
+    hook = self.class.on_transaction_done
+    hook.call unless hook.nil?
+    
     Puppet.debug "Finishing transaction #{object_id}"
   end
 
